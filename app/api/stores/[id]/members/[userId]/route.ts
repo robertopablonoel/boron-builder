@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 // PATCH /api/stores/[id]/members/[userId] - Update member role
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -19,7 +19,10 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const storeId = params.id
+    const { id, userId } = await params
+
+
+    const storeId = id
     const targetUserId = params.userId
 
     // Check if current user is owner (only owners can change roles)
@@ -102,7 +105,7 @@ export async function PATCH(
 // DELETE /api/stores/[id]/members/[userId] - Remove member
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -117,7 +120,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const storeId = params.id
+    const { id, userId } = await params
+
+
+    const storeId = id
     const targetUserId = params.userId
 
     // Check if current user is owner or admin

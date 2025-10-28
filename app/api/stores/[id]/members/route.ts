@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 // GET /api/stores/[id]/members - List store members
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -19,7 +19,10 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const storeId = params.id
+    const { id } = await params
+
+
+    const storeId = id
 
     // Check if user is a member of this store
     const { data: membership, error: membershipError } = await supabase

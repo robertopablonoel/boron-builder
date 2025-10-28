@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 // GET /api/stores/[id] - Get store details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -19,7 +19,10 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const storeId = params.id
+    const { id } = await params
+
+
+    const storeId = id
 
     // Check if user is a member of this store
     const { data: membership, error: membershipError } = await supabase
@@ -72,7 +75,7 @@ export async function GET(
 // PATCH /api/stores/[id] - Update store
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -87,7 +90,10 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const storeId = params.id
+    const { id } = await params
+
+
+    const storeId = id
 
     // Check if user is owner or admin
     const { data: membership, error: membershipError } = await supabase
@@ -151,7 +157,7 @@ export async function PATCH(
 // DELETE /api/stores/[id] - Delete store (owner only)
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -166,7 +172,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const storeId = params.id
+    const { id } = await params
+
+
+    const storeId = id
 
     // Check if user is owner
     const { data: store, error: storeError } = await supabase

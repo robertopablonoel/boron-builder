@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 // POST /api/invites/[token]/decline - Decline invitation
 export async function POST(
   request: Request,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -19,7 +19,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const token = params.token
+    const { token } = await params
 
     // Get invitation by token
     const { data: invite, error: inviteError } = await supabase

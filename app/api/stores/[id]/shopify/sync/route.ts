@@ -5,7 +5,7 @@ import { ShopifyClient } from '@/lib/shopify/client'
 // POST /api/stores/[id]/shopify/sync - Trigger product sync
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -20,7 +20,10 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const storeId = params.id
+    const { id } = await params
+
+
+    const storeId = id
 
     // Check if user has access to store
     const { data: membership, error: membershipError } = await supabase

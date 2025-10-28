@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 // POST /api/funnels/[id]/duplicate - Duplicate funnel
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -19,7 +19,8 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const funnelId = params.id
+    const { id } = await params
+    const funnelId = id
 
     // Get original funnel
     const { data: originalFunnel, error: funnelError } = await supabase

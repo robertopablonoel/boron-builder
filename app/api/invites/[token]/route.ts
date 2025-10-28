@@ -4,11 +4,11 @@ import { NextResponse } from 'next/server'
 // GET /api/invites/[token] - Get invitation details
 export async function GET(
   request: Request,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ) {
   try {
     const supabase = await createClient()
-    const token = params.token
+    const { token } = await params
 
     // Get invitation by token
     const { data: invite, error: inviteError } = await supabase

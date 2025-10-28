@@ -32,7 +32,7 @@ async function checkFunnelAccess(supabase: any, funnelId: string, userId: string
 // GET /api/funnels/[id] - Get funnel details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -47,7 +47,8 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const funnelId = params.id
+    const { id } = await params
+    const funnelId = id
 
     // Check access and get funnel
     const result = await checkFunnelAccess(supabase, funnelId, user.id)
@@ -68,7 +69,7 @@ export async function GET(
 // PATCH /api/funnels/[id] - Update funnel
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -83,7 +84,8 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const funnelId = params.id
+    const { id } = await params
+    const funnelId = id
 
     // Check access
     const result = await checkFunnelAccess(supabase, funnelId, user.id)
@@ -167,7 +169,7 @@ export async function PATCH(
 // DELETE /api/funnels/[id] - Delete funnel
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -182,7 +184,8 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const funnelId = params.id
+    const { id } = await params
+    const funnelId = id
 
     // Check access
     const result = await checkFunnelAccess(supabase, funnelId, user.id)

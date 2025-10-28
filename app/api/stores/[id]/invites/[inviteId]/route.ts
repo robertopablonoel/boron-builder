@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 // DELETE /api/stores/[id]/invites/[inviteId] - Cancel invitation
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string; inviteId: string } }
+  { params }: { params: Promise<{ id: string; inviteId: string }> }
 ) {
   try {
     const supabase = await createClient()
@@ -19,8 +19,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const storeId = params.id
-    const inviteId = params.inviteId
+    const { id, inviteId } = await params
+
+
+    const storeId = id
 
     // Check if user is owner or admin
     const { data: membership, error: membershipError } = await supabase
