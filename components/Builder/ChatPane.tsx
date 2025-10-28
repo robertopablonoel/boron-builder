@@ -1,20 +1,49 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useChatStore } from '@/lib/store/chat-store';
 import { useFunnelStore } from '@/lib/store/funnel-store';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
+import { ProductPickerModal } from './product-picker-modal';
+
+interface Product {
+  id: string
+  shopify_product_id: string
+  title: string
+  description: string
+  price: number
+  compare_at_price: number | null
+  featured_image: string | null
+  vendor: string
+  product_type: string
+  tags: string[]
+  variants: any[]
+}
 
 export function ChatPane() {
+  const searchParams = useSearchParams();
+  const storeId = searchParams.get('storeId') || searchParams.get('funnelId');
+
   const { messages, addMessage, setStreaming, isStreaming, clearHistory } = useChatStore();
   const { funnel, setFunnel } = useFunnelStore();
   const [error, setError] = useState<string | null>(null);
+  const [showProductPicker, setShowProductPicker] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const handleClear = () => {
     clearHistory();
     setFunnel(null);
     setError(null);
+    setSelectedProduct(null);
+  };
+
+  const handleProductSelect = (product: Product) => {
+    setSelectedProduct(product);
+    // Optionally auto-populate a message about the product
+    const productMessage = `Create a funnel for ${product.title} (${product.vendor}) - $${product.price.toFixed(2)}`;
+    handleSendMessage(productMessage);
   };
 
   const handleSendMessage = async (content: string) => {
@@ -34,6 +63,7 @@ export function ChatPane() {
           message: content,
           conversationHistory: messages,
           currentFunnel: funnel,
+          selectedProduct: selectedProduct,
         }),
       });
 
@@ -64,21 +94,36 @@ export function ChatPane() {
       {/* Header */}
       <div className="p-4 border-b border-gray-200 bg-white flex-shrink-0">
         <div className="flex items-start justify-between">
-          <div>
+          <div className="flex-1">
             <h1 className="text-xl font-bold text-gray-900">Boron Builder</h1>
             <p className="text-sm text-gray-600">
-              {funnel ? 'Refine your funnel' : 'Describe your product to generate a funnel'}
+              {selectedProduct
+                ? `Building funnel for: ${selectedProduct.title}`
+                : funnel
+                  ? 'Refine your funnel'
+                  : 'Select a product or describe what you want to sell'}
             </p>
           </div>
-          {messages.length > 0 && (
-            <button
-              onClick={handleClear}
-              className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded-md hover:bg-gray-100 transition-colors"
-              title="Clear chat and preview"
-            >
-              Clear
-            </button>
-          )}
+          <div className="flex gap-2">
+            {storeId && (
+              <button
+                onClick={() => setShowProductPicker(true)}
+                className="text-sm text-blue-600 hover:text-blue-700 px-3 py-1 rounded-md hover:bg-blue-50 transition-colors font-medium"
+                title="Select a product from your store"
+              >
+                {selectedProduct ? 'Change Product' : 'Select Product'}
+              </button>
+            )}
+            {messages.length > 0 && (
+              <button
+                onClick={handleClear}
+                className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1 rounded-md hover:bg-gray-100 transition-colors"
+                title="Clear chat and preview"
+              >
+                Clear
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -107,12 +152,24 @@ export function ChatPane() {
           onSend={handleSendMessage}
           disabled={isStreaming}
           placeholder={
-            funnel
+            selectedProduct
               ? 'Refine your funnel (e.g., "Add urgency banner at top")'
-              : 'Describe your product (e.g., "Organic sleep gummies with melatonin")'
+              : funnel
+                ? 'Refine your funnel (e.g., "Add urgency banner at top")'
+                : 'Describe your product (e.g., "Organic sleep gummies with melatonin")'
           }
         />
       </div>
+
+      {/* Product Picker Modal */}
+      {storeId && (
+        <ProductPickerModal
+          isOpen={showProductPicker}
+          onClose={() => setShowProductPicker(false)}
+          storeId={storeId}
+          onSelectProduct={handleProductSelect}
+        />
+      )}
     </div>
   );
 }

@@ -15,6 +15,7 @@ export async function middleware(request: NextRequest) {
     '/stores',
     '/funnels',
     '/builder',
+    '/invites',
   ]
 
   // Check if the current path is protected

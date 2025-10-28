@@ -29,22 +29,16 @@ export function DashboardHeader() {
                 Dashboard
               </Link>
               <Link
+                href="/stores"
+                className="text-sm font-medium text-gray-700 hover:text-gray-900"
+              >
+                Stores
+              </Link>
+              <Link
                 href="/builder"
                 className="text-sm font-medium text-gray-700 hover:text-gray-900"
               >
                 Builder
-              </Link>
-              <Link
-                href="/dashboard"
-                className="text-sm font-medium text-gray-700 hover:text-gray-900"
-              >
-                Funnels
-              </Link>
-              <Link
-                href="/dashboard"
-                className="text-sm font-medium text-gray-700 hover:text-gray-900"
-              >
-                Stores
               </Link>
             </nav>
           </div>
