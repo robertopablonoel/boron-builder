@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   // Update session (refresh tokens if needed)
-  const response = await updateSession(request)
+  const { response, user } = await updateSession(request)
 
   // Get pathname
   const pathname = request.nextUrl.pathname
@@ -14,6 +14,7 @@ export async function middleware(request: NextRequest) {
     '/settings',
     '/stores',
     '/funnels',
+    '/builder',
   ]
 
   // Check if the current path is protected
@@ -21,16 +22,11 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith(route)
   )
 
-  if (isProtectedRoute) {
-    // Check if user is authenticated by looking for session cookie
-    const supabaseToken = request.cookies.get('sb-127.0.0.1-auth-token')
-
-    if (!supabaseToken) {
-      // Redirect to login if not authenticated
-      const redirectUrl = new URL('/auth/signin', request.url)
-      redirectUrl.searchParams.set('redirectTo', pathname)
-      return NextResponse.redirect(redirectUrl)
-    }
+  if (isProtectedRoute && !user) {
+    // Redirect to login if not authenticated
+    const redirectUrl = new URL('/auth/signin', request.url)
+    redirectUrl.searchParams.set('redirectTo', pathname)
+    return NextResponse.redirect(redirectUrl)
   }
 
   return response

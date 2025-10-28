@@ -19,19 +19,32 @@ export default function SignInPage() {
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
+    try {
+      const supabase = createClient()
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-    } else {
+      if (error) {
+        console.error('Sign in error:', error)
+        setError(error.message)
+        setLoading(false)
+        return
+      }
+
+      console.log('Sign in successful:', data.user?.email)
+
+      // Wait a moment for auth state to propagate
+      await new Promise(resolve => setTimeout(resolve, 500))
+
       router.push(redirectTo)
       router.refresh()
+    } catch (err) {
+      console.error('Unexpected error:', err)
+      setError('An unexpected error occurred. Please try again.')
+      setLoading(false)
     }
   }
 
