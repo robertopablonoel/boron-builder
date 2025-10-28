@@ -23,7 +23,7 @@ export async function PATCH(
 
 
     const storeId = id
-    const targetUserId = params.userId
+    const targetUserId = userId
 
     // Check if current user is owner (only owners can change roles)
     const { data: currentUserMembership, error: membershipError } =
@@ -124,7 +124,7 @@ export async function DELETE(
 
 
     const storeId = id
-    const targetUserId = params.userId
+    const targetUserId = userId
 
     // Check if current user is owner or admin
     const { data: currentUserMembership, error: membershipError } =
