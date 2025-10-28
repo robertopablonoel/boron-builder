@@ -50,3 +50,7 @@ next-env.d.ts
 
 # Zustand persist storage (development)
 .zustand-storage
+
+# Supabase
+/supabase/.temp/
+/supabase/.branches/

@@ -1,20 +1,29 @@
-'use client';
+'use client'
 
-import { ChatPane } from '@/components/Builder/ChatPane';
-import { PreviewPane } from '@/components/Builder/PreviewPane';
+import { useAuth } from '@/components/providers/auth-provider'
+import { LandingPage } from '@/components/landing/landing-page'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function Home() {
-  return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
-      {/* Chat Pane - Left */}
-      <div className="w-1/2 border-r border-gray-200 flex flex-col">
-        <ChatPane />
-      </div>
+  const { user, loading } = useAuth()
+  const router = useRouter()
 
-      {/* Preview Pane - Right */}
-      <div className="w-1/2 flex flex-col">
-        <PreviewPane />
+  useEffect(() => {
+    // Redirect authenticated users to dashboard
+    if (user && !loading) {
+      router.push('/dashboard')
+    }
+  }, [user, loading, router])
+
+  // Show landing page for unauthenticated users
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
-    </div>
-  );
+    )
+  }
+
+  return <LandingPage />
 }
