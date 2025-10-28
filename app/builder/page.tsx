@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChatPane } from '@/components/builder/ChatPane';
 import { PreviewPane } from '@/components/builder/PreviewPane';
 import { BuilderHeader } from '@/components/builder/builder-header';
 
-export default function BuilderPage() {
+function BuilderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const funnelId = searchParams.get('funnelId');
@@ -128,5 +128,17 @@ export default function BuilderPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BuilderPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <BuilderContent />
+    </Suspense>
   );
 }

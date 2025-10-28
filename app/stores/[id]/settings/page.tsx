@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { DashboardHeader } from '@/components/dashboard/dashboard-header'
 import { ShopifyConnectionCard } from '@/components/shopify/shopify-connection-card'
@@ -14,7 +14,7 @@ interface Store {
   shopify_connected_at: string | null
 }
 
-export default function StoreSettingsPage() {
+function StoreSettingsContent() {
   const params = useParams()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -234,5 +234,20 @@ export default function StoreSettingsPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function StoreSettingsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50">
+        <DashboardHeader />
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </div>
+    }>
+      <StoreSettingsContent />
+    </Suspense>
   )
 }
