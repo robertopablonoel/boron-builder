@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ChatPane } from '@/components/Builder/ChatPane';
-import { PreviewPane } from '@/components/Builder/PreviewPane';
+import { ChatPane } from '@/components/builder/ChatPane';
+import { PreviewPane } from '@/components/builder/PreviewPane';
 import { BuilderHeader } from '@/components/builder/builder-header';
 
 export default function BuilderPage() {
