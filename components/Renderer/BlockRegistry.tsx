@@ -12,7 +12,8 @@ import { ProductImageCarousel } from '../Blocks/ProductImageCarousel';
 import { AddToCartButton } from '../Blocks/AddToCartButton';
 import { UpsellCarousel } from '../Blocks/UpsellCarousel';
 
-export const BlockRegistry: Record<string, React.ComponentType<Record<string, unknown>>> = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const BlockRegistry: Record<string, React.ComponentType<any>> = {
   Banner,
   Callout,
   Text,

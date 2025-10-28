@@ -199,8 +199,8 @@ export async function POST(req: NextRequest) {
     // Generic error
     return NextResponse.json(
       {
-        error: error.message || 'Failed to generate funnel',
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' && error instanceof Error ? error.stack : undefined,
       },
       { status: 500 }
     );

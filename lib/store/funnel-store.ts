@@ -14,7 +14,7 @@ interface FunnelState {
   metadata: FunnelMetadata;
 
   // Actions
-  setFunnel: (funnel: Funnel) => void;
+  setFunnel: (funnel: Funnel | null) => void;
   updateBlock: (blockId: string, props: Record<string, unknown>) => void;
   deleteBlock: (blockId: string) => void;
   reorderBlocks: (fromIndex: number, toIndex: number) => void;
@@ -53,7 +53,7 @@ export const useFunnelStore = create<FunnelState>()(
 
           const updatedBlocks = state.funnel.blocks.map((block) =>
             block.id === blockId
-              ? { ...block, props: { ...block.props, ...props } }
+              ? ({ ...block, props: { ...block.props, ...props } } as Block)
               : block
           );
 
