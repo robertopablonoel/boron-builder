@@ -7,6 +7,7 @@
 - Create `profiles` table with Row Level Security (RLS)
 - Create `stores` table (organizations with Shopify connection)
 - Create `store_members` table (users ↔ stores with roles)
+- Create `store_invites` table (pending team invitations)
 - Create `funnels` table linked to stores
 - Create `shopify_products` table linked to stores
 - Create `sync_jobs` table linked to stores
@@ -419,7 +420,100 @@ CREATE POLICY "Store members can manage products"
   );
 ```
 
-### 7. Create Sync Jobs Table
+### 7. Create Store Invites Table
+
+Create a **new query** and run:
+
+```sql
+-- ============================================
+-- STORE INVITES TABLE
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS store_invites (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_id uuid NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
+  email text NOT NULL,
+  role text NOT NULL DEFAULT 'member',
+  invited_by uuid NOT NULL REFERENCES auth.users(id),
+
+  -- Invite token for secure acceptance
+  token text UNIQUE NOT NULL DEFAULT gen_random_uuid()::text,
+
+  -- Status tracking
+  status text DEFAULT 'pending', -- 'pending' | 'accepted' | 'expired' | 'cancelled'
+  expires_at timestamptz DEFAULT (now() + interval '7 days'),
+  accepted_at timestamptz,
+  accepted_by uuid REFERENCES auth.users(id),
+
+  created_at timestamptz DEFAULT now(),
+
+  -- Constraints
+  CONSTRAINT valid_invite_role CHECK (role IN ('admin', 'member')), -- Can't invite as owner
+  CONSTRAINT valid_invite_status CHECK (status IN ('pending', 'accepted', 'expired', 'cancelled')),
+  UNIQUE(store_id, email, status) -- One pending invite per email per store
+);
+
+-- Add comment
+COMMENT ON TABLE store_invites IS 'Pending invitations to join stores';
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS store_invites_store_id_idx ON store_invites(store_id);
+CREATE INDEX IF NOT EXISTS store_invites_email_idx ON store_invites(email);
+CREATE INDEX IF NOT EXISTS store_invites_token_idx ON store_invites(token);
+CREATE INDEX IF NOT EXISTS store_invites_status_idx ON store_invites(status);
+
+-- Enable RLS
+ALTER TABLE store_invites ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies
+CREATE POLICY "Store members can view invites for their stores"
+  ON store_invites FOR SELECT
+  USING (
+    store_id IN (
+      SELECT store_id FROM store_members
+      WHERE user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Store owners/admins can create invites"
+  ON store_invites FOR INSERT
+  WITH CHECK (
+    store_id IN (
+      SELECT store_id FROM store_members
+      WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
+    )
+  );
+
+CREATE POLICY "Store owners/admins can cancel invites"
+  ON store_invites FOR UPDATE
+  USING (
+    store_id IN (
+      SELECT store_id FROM store_members
+      WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
+    )
+  );
+
+-- Anyone with the token can view their own invite (for acceptance page)
+CREATE POLICY "Anyone can view invite by token"
+  ON store_invites FOR SELECT
+  USING (true); -- Will filter by token in application code
+
+-- Function to auto-expire old invites
+CREATE OR REPLACE FUNCTION expire_old_invites()
+RETURNS void AS $$
+BEGIN
+  UPDATE store_invites
+  SET status = 'expired'
+  WHERE status = 'pending'
+  AND expires_at < now();
+END;
+$$ LANGUAGE plpgsql;
+
+-- You can call this periodically or via a cron job:
+-- SELECT expire_old_invites();
+```
+
+### 8. Create Sync Jobs Table
 
 Create a **new query** and run:
 
@@ -480,7 +574,7 @@ CREATE POLICY "Store members can create sync jobs"
   );
 ```
 
-### 8. Verify Tables Created
+### 9. Verify Tables Created
 
 Run this query to check all tables exist:
 
@@ -488,7 +582,7 @@ Run this query to check all tables exist:
 SELECT table_name
 FROM information_schema.tables
 WHERE table_schema = 'public'
-AND table_name IN ('profiles', 'stores', 'store_members', 'funnels', 'shopify_products', 'sync_jobs')
+AND table_name IN ('profiles', 'stores', 'store_members', 'store_invites', 'funnels', 'shopify_products', 'sync_jobs')
 ORDER BY table_name;
 ```
 
@@ -499,12 +593,13 @@ table_name
 funnels
 profiles
 shopify_products
+store_invites
 store_members
 stores
 sync_jobs
 ```
 
-### 9. Test RLS Policies
+### 10. Test RLS Policies
 
 Create a test user and verify RLS works:
 
@@ -516,18 +611,19 @@ SELECT * FROM profiles;
 -- Check policies exist
 SELECT schemaname, tablename, policyname
 FROM pg_policies
-WHERE tablename IN ('profiles', 'stores', 'store_members', 'funnels', 'shopify_products', 'sync_jobs')
+WHERE tablename IN ('profiles', 'stores', 'store_members', 'store_invites', 'funnels', 'shopify_products', 'sync_jobs')
 ORDER BY tablename, policyname;
 ```
 
-### 10. View Database Schema
+### 11. View Database Schema
 
 In Supabase dashboard:
 1. Go to "Table Editor"
-2. You should see all 6 tables:
+2. You should see all 7 tables:
    - `profiles`
    - `stores`
    - `store_members`
+   - `store_invites`
    - `funnels`
    - `shopify_products`
    - `sync_jobs`
