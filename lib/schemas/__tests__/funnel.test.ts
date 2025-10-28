@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { FunnelSchema, BlockSchema } from '../funnel.schema';
-import { validateFunnel, validateFunnelRules } from '../../validation';
-import { validFunnel, invalidFunnel } from './fixtures';
+import { FunnelSchema } from '../funnel.schema';
+import { validateFunnelRules } from '../../validation';
+import { validFunnel } from './fixtures';
 
 describe('FunnelSchema', () => {
   it('validates a correct funnel', () => {

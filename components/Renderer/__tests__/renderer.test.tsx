@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { FunnelRenderer } from '../FunnelRenderer';
 import { BlockRegistry } from '../BlockRegistry';
-import type { Funnel } from '@/lib/schemas/funnel.schema';
+import type { Funnel, Block } from '@/lib/schemas/funnel.schema';
 
 describe('BlockRegistry', () => {
   it('exports all block components', () => {
@@ -107,16 +107,16 @@ describe('FunnelRenderer', () => {
   it('handles unknown block types gracefully', () => {
     const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    const funnelWithUnknownBlock: Funnel = {
+    const funnelWithUnknownBlock = {
       ...mockFunnel,
       blocks: [
         {
           id: 'unknown-block',
-          type: 'UnknownBlockType' as any,
-          props: {} as any,
-        },
+          type: 'UnknownBlockType',
+          props: {},
+        } as unknown as Block,
       ],
-    };
+    } as Funnel;
 
     render(<FunnelRenderer funnel={funnelWithUnknownBlock} />);
 

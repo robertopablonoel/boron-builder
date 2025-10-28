@@ -35,7 +35,7 @@ export function Reviews({ items, layout = 'stacked' }: ReviewsProps) {
                     </span>
                   )}
                 </div>
-                <p className="text-gray-700 italic mb-3">"{review.quote}"</p>
+                <p className="text-gray-700 italic mb-3">&ldquo;{review.quote}&rdquo;</p>
                 <p className="text-sm font-medium text-gray-900">
                   — {review.name}
                 </p>
@@ -67,7 +67,7 @@ export function Reviews({ items, layout = 'stacked' }: ReviewsProps) {
               )}
             </div>
             <p className="text-gray-700 italic mb-3 leading-relaxed">
-              "{review.quote}"
+              &ldquo;{review.quote}&rdquo;
             </p>
             <p className="text-sm font-medium text-gray-900">— {review.name}</p>
           </div>

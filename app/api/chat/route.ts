@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     const truncatedHistory = conversationHistory.slice(-MAX_CONVERSATION_LENGTH);
 
     // Build messages array
-    const messages: Anthropic.MessageParam[] = truncatedHistory.map((msg: any) => ({
+    const messages: Anthropic.MessageParam[] = truncatedHistory.map((msg: { role: string; content: string }) => ({
       role: msg.role === 'user' ? 'user' : 'assistant',
       content: msg.content,
     }));
@@ -158,7 +158,8 @@ export async function POST(req: NextRequest) {
         output_tokens: response.usage.output_tokens,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('❌ API Error:', error);
 
     // Log error
@@ -166,27 +167,29 @@ export async function POST(req: NextRequest) {
       timestamp: new Date().toISOString(),
       method: 'POST',
       path: '/api/chat',
-      message: error.message || 'Unknown error',
+      message: errorMessage,
       responseTime: Date.now() - startTime,
       success: false,
     });
 
     // Handle Anthropic API errors
-    if (error.status === 401) {
+    const errorStatus = error && typeof error === 'object' && 'status' in error ? (error as { status: number }).status : null;
+
+    if (errorStatus === 401) {
       return NextResponse.json(
         { error: 'Invalid API key. Check your ANTHROPIC_API_KEY environment variable.' },
         { status: 401 }
       );
     }
 
-    if (error.status === 429) {
+    if (errorStatus === 429) {
       return NextResponse.json(
         { error: 'Rate limit exceeded. Please try again in a moment.' },
         { status: 429 }
       );
     }
 
-    if (error.status === 529) {
+    if (errorStatus === 529) {
       return NextResponse.json(
         { error: 'Claude is currently overloaded. Please try again.' },
         { status: 503 }

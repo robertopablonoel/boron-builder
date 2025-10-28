@@ -52,7 +52,7 @@ export function importFunnelJSON(file: File): Promise<Funnel> {
       try {
         const json = JSON.parse(e.target?.result as string);
         resolve(json as Funnel);
-      } catch (error) {
+      } catch {
         reject(new Error('Invalid JSON file'));
       }
     };

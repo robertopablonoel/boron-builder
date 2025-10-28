@@ -106,7 +106,7 @@ export function isFunnel(data: unknown): data is Funnel {
 /**
  * Validates a single block
  */
-export function validateBlock(data: unknown): boolean {
+export function validateBlock(): boolean {
   // Import BlockSchema if needed for single block validation
   return true; // Implement if needed
 }

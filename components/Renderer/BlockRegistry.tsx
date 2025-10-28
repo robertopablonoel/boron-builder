@@ -12,7 +12,7 @@ import { ProductImageCarousel } from '../Blocks/ProductImageCarousel';
 import { AddToCartButton } from '../Blocks/AddToCartButton';
 import { UpsellCarousel } from '../Blocks/UpsellCarousel';
 
-export const BlockRegistry: Record<string, React.ComponentType<any>> = {
+export const BlockRegistry: Record<string, React.ComponentType<Record<string, unknown>>> = {
   Banner,
   Callout,
   Text,

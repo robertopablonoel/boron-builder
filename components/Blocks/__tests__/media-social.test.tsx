@@ -25,8 +25,8 @@ describe('Media & Social Blocks', () => {
       render(<Reviews items={mockReviews} layout="stacked" />);
       expect(screen.getByText(/John Doe/)).toBeInTheDocument();
       expect(screen.getByText(/Jane Smith/)).toBeInTheDocument();
-      expect(screen.getByText('"Great product! Highly recommend."')).toBeInTheDocument();
-      expect(screen.getByText('"Good quality, fast shipping."')).toBeInTheDocument();
+      expect(screen.getByText(/Great product! Highly recommend\./)).toBeInTheDocument();
+      expect(screen.getByText(/Good quality, fast shipping\./)).toBeInTheDocument();
     });
 
     it('displays star ratings correctly', () => {

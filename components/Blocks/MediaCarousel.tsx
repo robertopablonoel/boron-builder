@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface MediaItem {
   type: 'image' | 'video';
@@ -20,9 +20,9 @@ export function MediaCarousel({
   const [currentIndex, setCurrentIndex] = useState(0);
   const autoplayRef = useRef<NodeJS.Timeout | null>(null);
 
-  const goToNext = () => {
+  const goToNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % media.length);
-  };
+  }, [media.length]);
 
   const goToPrev = () => {
     setCurrentIndex((prev) => (prev - 1 + media.length) % media.length);
@@ -44,7 +44,7 @@ export function MediaCarousel({
         }
       };
     }
-  }, [autoplay, media.length, currentIndex]);
+  }, [autoplay, media.length, currentIndex, goToNext]);
 
   const currentMedia = media[currentIndex];
 

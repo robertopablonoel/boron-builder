@@ -24,14 +24,14 @@ export function MessageList({ messages, isStreaming = false }: MessageListProps)
             Start a conversation
           </h3>
           <p className="text-gray-600 text-sm">
-            Describe your product and I'll generate a high-converting funnel for you.
+            Describe your product and I&apos;ll generate a high-converting funnel for you.
           </p>
           <div className="mt-6 text-left bg-gray-50 rounded-lg p-4 text-sm text-gray-700">
             <p className="font-medium mb-2">Try examples like:</p>
             <ul className="space-y-1 list-disc list-inside">
-              <li>"Organic sleep gummies with melatonin"</li>
-              <li>"Sustainable yoga mats for beginners"</li>
-              <li>"Premium cold brew coffee subscription"</li>
+              <li>&ldquo;Organic sleep gummies with melatonin&rdquo;</li>
+              <li>&ldquo;Sustainable yoga mats for beginners&rdquo;</li>
+              <li>&ldquo;Premium cold brew coffee subscription&rdquo;</li>
             </ul>
           </div>
         </div>
